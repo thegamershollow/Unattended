@@ -1,0 +1,82 @@
+default local
+timeout 100
+prompt 1
+display msgs/boot.msg
+F1 msgs/boot.msg
+F2 msgs/additional.msg
+F3 msgs/information.msg
+
+label local
+  localboot 0
+
+label b44
+    kernel unattended/memdisk
+    append initrd=unattended/b44.imz
+
+label b57
+    kernel unattended/memdisk
+    append initrd=unattended/b57.imz
+
+label dc21x4
+    kernel unattended/memdisk
+    append initrd=unattended/dc21x4.imz
+
+label dp83815
+    kernel unattended/memdisk
+    append initrd=unattended/dp83815.imz
+
+label e100b
+    kernel unattended/memdisk
+    append initrd=unattended/e100b.imz
+
+label e1000
+    kernel unattended/memdisk
+    append initrd=unattended/e1000.imz
+
+label elpc575
+    kernel unattended/memdisk
+    append initrd=unattended/elpc575.imz
+
+label el556
+    kernel unattended/memdisk
+    append initrd=unattended/el556.imz
+
+label el90x
+    kernel unattended/memdisk
+    append initrd=unattended/el90x.imz
+
+label el94x
+    kernel unattended/memdisk
+    append initrd=unattended/el94x.imz
+
+label fetnd
+    kernel unattended/memdisk
+    append initrd=unattended/fetnd.imz
+
+label yuknd
+    kernel unattended/memdisk
+    append initrd=unattended/yuknd.imz
+
+label ngrpci
+    kernel unattended/memdisk
+    append initrd=unattended/ngrpci.imz
+
+label pcntnd
+    kernel unattended/memdisk
+    append initrd=unattended/pcntnd.imz
+
+label rtsnd
+    kernel unattended/memdisk
+    append initrd=unattended/rtsnd.imz
+
+label rtgbnd
+    kernel unattended/memdisk
+    append initrd=unattended/rtgbnd.imz
+
+label sis900
+    kernel unattended/memdisk
+    append initrd=unattended/sis900.imz
+
+label undis3c
+    kernel unattended/memdisk
+    append initrd=unattended/undis3c.imz keeppxe

@@ -1,0 +1,330 @@
+=head2 Sun Jun  5 01:54:26 2011: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jun  5 01:54:42 2011: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.613>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof dbilogstrip>
+
+=back
+
+=head2 Sun Jun  5 01:54:51 2011: C<Module> L<DBD::mysql|DBD::mysql>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.9008>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jun  5 01:54:52 2011: C<Module> L<DBD::PgPP|DBD::PgPP>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jun  5 01:54:55 2011: C<Module> L<Net::LDAP|Net::LDAP>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jun  5 01:55:12 2011: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.36>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Jun  5 01:55:13 2011: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Sun Jun  5 03:12:24 2011: C<Module> L<DBD::mysql|DBD::mysql>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.9008>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:20 2011: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:36 2011: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.613>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof dbilogstrip>
+
+=back
+
+=head2 Mon Jun  6 14:15:45 2011: C<Module> L<DBD::mysql|DBD::mysql>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.9008>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:46 2011: C<Module> L<DBD::PgPP|DBD::PgPP>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:49 2011: C<Module> L<Net::LDAP|Net::LDAP>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:52 2011: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.36>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Jun  6 14:15:53 2011: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: /opt/perl/lib/site_perl/5.10.1>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
