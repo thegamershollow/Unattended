@@ -1,0 +1,206 @@
+Here are some random notes.  They probably are not going to be
+up-to-date for very long, but I feel like dumping some information.
+
+
+Linux
+=====
+
+Linux supports a new "initramfs" format for initial ramdisks.  This
+format is cool because it is just a cpio(1) archive, which is easy to
+create with unprivileged tools; no need to go root and make a loopback
+mount.  Actually, the format is a sequence of cpio archives, which is
+even cooler.  (See
+http://linux.bkbits.net:8080/linux-2.5/src/Documentation/early-userspace).
+
+Since the initramfs is a sequence of cpio archives, we can create one
+cpio archive from a tree of files and a separate cpio archive of /dev
+files and glom them together.  This is nice because "mknod" requires
+root access, and we want to avoid requiring root access.  The
+tools/mknod-cpio.pl script directly generates a cpio archive of device
+nodes when fed misc/devices.txt as input.
+
+Most Linux device drivers declare a MODULE_DEVICE_TABLE which lists
+the hardware which they support.  The "depmod" utility distills this
+information into files like /lib/modules/2.6.6/modules.pcimap.  By
+using this map and the contents of /sys (sysfs), a usermode utility
+can autoprobe hardware and decide which drivers to load.  The
+misc/find-modules-pci script does this.  It is loosely based on the
+agent.pci script from the Linux hotplug utilities
+(http://www.kernel.org/pub/linux/utils/kernel/hotplug/).  This only
+takes care of PCI devices; we need to add USB, PCMCIA, etc. someday.
+
+Some modules do not declare a MODULE_DEVICE_TABLE.  Our
+misc/extra.pcimap file holds any additions we need to make.  This will
+likely change from kernel version to kernel version, but it is no big
+deal to load the same module twice (or even the wrong module), as long
+as we load at least the ones we actually need.
+
+To create misc/linux-config, I ran "make gconfig" in the Linux source
+tree and made a copy of the resulting .config file.  The Makefile here
+just copies misc/linux-config to $(linux)/.config and runs "make
+oldconfig" to configure the kernel.  This provides so-so support for
+future kernels, but we typically have to refresh the configuration
+with each kernel release (especially since the Linux folks are always
+adding new drivers).
+
+
+The disk geometry nightmare
+===========================
+
+The Linux HDIO_GETGEO ioctl() returns the geometry
+(cylinders/heads/sectors) of a hard disk.  Unfortunately, these values
+are not always the same as that returned by the BIOS, especially the
+legacy INT 13/AH=08h interface (see
+http://www.ctyme.com/intr/rb-0621.htm).  After some discussion on the
+SYSLINUX list, my solution (see
+http://www.zytor.com/pipermail/syslinux/2004-February/003269.html) was
+to patch the kernel to invoke the BIOS calls at startup, and modify
+the EDD device driver to expose those values under /sys/firmware/edd.
+
+My patch was accepted into Linux 2.6.5
+(http://groups.google.com/groups?threadm=1xXh2-850-17%40gated-at.bofh.it)
+and modified somewhat in Linux 2.6.7
+(http://article.gmane.org/gmane.linux.kernel/208395).
+
+So, our scripts can read the files under /sys/firmware/edd, use them
+to set some environment variables (LEGACY_BIOS_HEAD and
+LEGACY_BIOS_SECT), and fix the kernel's notion of the geometry by
+writing "bios_cyl:<C> bios_head:<H> bios_sect:<S>" into the
+/proc/ide/hdX/settings file.
+
+This corrects the values returned by HDIO_GETGEO, which both Parted
+and Dosemu use.  Without this correction, Windows Setup creates a
+partition which its own loader cannot boot ("NTLDR not found").  I am
+not completely sure whether the partition table (more likely) or
+Dosemu environment (less likely) is responsible, but it does not
+matter because this fixes both.
+
+Note that /proc/ide/hdX/settings only exists for IDE devices.
+Browsing the Linux kernel source, I have some hope that most SCSI and
+RAID drivers already return the BIOS-friendly geometry in HDIO_GETGEO.
+So far, this hope has been validated by our users.  If this turns out
+to be wrong, we will need to find some way to manually feed the
+geometry into Dosemu (easy) and Parted (hard).
+
+There is a related issue, which is that we assume BIOS device 80h (the
+boot device) is the one onto which we are installing.  Our selection
+algorithm (look for amiraid/ar0, then ataraid/d0, etc.) is much too
+primitive and certainly wrong for complex multi-disk setups.  This may
+be our biggest FIXME at present.
+
+
+module-init-tools
+=================
+
+This is the 2.6.x kernel's replacement for "modutils".  We need it at
+build time to run "depmod" and at run time to run "modprobe" (which
+runs "insmod").  The binaries are small, except for insmod.static,
+which we just delete.
+
+
+bash
+====
+
+I know, Bash is huge.  But I am so accustomed to it that I can no
+longer remember which shell features are POSIX and which are Bash
+extensions.  So sue me.
+
+We use a horrible hack (bash_cv_termcap_lib=gnutermcap ./configure) to
+trick Bash into using its built-in primitive termcap code, instead of
+hunting around looking for libtermcap and libncurses.  We do bundle
+ncurses (because nano needs it), but right now it lives on the
+network, not the boot disk.
+
+
+glibc
+=====
+
+I know, I know, glibc is really huge and is not meant for boot disks.
+The problem is that everything in the Linux world is written to link
+against glibc.  I looked at other C libraries (especially uClibc), but
+I was worried about Samba, because we need smbmount to gain access to
+our network share.  And what about dosemu or other big-ticket items?
+
+I decided that since a compressed libc.so will fit on a floppy
+(compressed, barely), we can live with it.  Not that we support
+booting this thing from floppy yet.
+
+Note that some sort of threading support (and "configure
+--enable-add-ons=nptl") appears to be required; modern versions of
+glibc do not build otherwise.
+
+Speaking of versions of glibc...  Even though glibc-2.3.2 is over a
+year old, it is the latest "official" release.  But every Linux
+distribution is shipping something called "glibc-2.3.3" or even
+"glibc-2.3.4", which they apparently obtain by pulling from the glibc
+CVS repository as of some random date.  So we do the same.  I wonder
+if there will ever be another real glibc release.
+
+Moving right along...  By default, your C compiler will compile and
+link against the local system libraries and headers.  This can cause
+problems at run time, when the executables are dynamically loaded
+against the libraries we are building here.  The "fakeinclude" and
+"fakelib" directories work around this problem by letting us build
+apps against the headers and libraries here.  Search the Makefile for
+"fake" to see how it works.
+
+
+klibc
+=====
+
+klibc is a super tiny C library.  Even if we use glibc for most
+things, for floppy boots we still need a tiny "early userspace" which
+can get the whole show on the road.
+
+Speaking of floppies, my ultimate plan is to write a custom autofs
+daemon which links against klibc, mount that daemon as "/floppy", and
+replace most files on the system with symlinks to /floppy/1/...,
+/floppy/2/..., and so on.  The custom autofs daemon, when it gets a
+request for "N", will print a message saying "Please insert floppy N
+and press Enter".  Then it will uncompress the floppy and return
+success back to the kernel, which will in turn return control back to
+whatever application was accessing the file.  The upshot is that the
+first time a file is needed (whether an app, library, or even kernel
+module), the user will be prompted to insert the appropriate diskette.
+
+But this custom autofs daemon has to reside entirely on the initial
+ramdisk, which in turn has to fit on a floppy.  klibc is perfect for
+this purpose.
+
+
+Samba
+=====
+
+This one was loads of fun.  See the Makefile rules and comments.
+CP850.so is some dynamically loaded Samba module for handling
+"codepage 850".  (Codepages, in turn, are some ancient DOS idiocy
+which survives in Samba.)  I ended up having to compile smbmount with
+-rdynamic so that CP850.so could be loaded successfully.  Omitting
+CP850.so is not an option, because that makes smbmount very very
+unhappy.
+
+The SBIN_PROGS and BIN_PROGS variables which I pass to Samba's "make
+install" are a complete hack, by the way.
+
+But hey, it is working now, so let us never speak of it again.
+
+
+The whole shebang
+=================
+
+The isolinux.cfg (and, someday, syslinux.cfg and pxelinux.cfg) file
+just fires up the kernel with no parameters.  Kernel 2.6.6 and later
+assume that if you have a file named "/init" on your initial ramdisk,
+then that file should be executed as soon as the ramdisk is unpacked.
+We use that mechanism (source in misc/init) to do some basic work
+which sets the stage for invoking /etc/master (source in misc/master),
+our master installation script.
+
+The Makefile generates a stage1/ directory holding the complete
+installation tree as seen after the disk is booted and the network is
+mounted.  The tools/move-and-link script is used to divvy up those
+files between stage2/ (which is the actual boot disk) and
+../install/linuxaux (which is on the Z:\ drive, which /etc/master
+mounts as /z).  For example, the file stage1/lib/libparted.so gets
+moved to ../install/linuxaux/libparted.so, and a symlink is created
+from stage2/lib/libparted.so to /z/linuxaux/lib/libparted.so.

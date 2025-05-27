@@ -1,0 +1,393 @@
+/****************************************************************************************
+ * Gila Screen Stylesheet
+ * $Id: screen.css,v 1.1 2005-01-16 04:23:06 nrichthof Exp $
+ ***************************************************************************************/
+
+
+/* ##### Common Styles ##### */
+
+body {
+  color: black;
+  background-color: rgb(243,242,235);
+  font-family: verdana, helvetica, arial, sans-serif;
+  font-size: 73%;  /* Enables font size scaling in MSIE */
+  margin: 0;
+  padding: 0;
+}
+
+html > body {
+  font-size: small;
+}
+
+img {
+  border: none;
+}
+
+acronym, .titleTip {
+  border-bottom: 1px dotted rgb(168,140,83);
+  cursor: help;
+  margin: 0;
+  padding: 0;
+}
+
+.doNotDisplay {
+  display: none !important;
+}
+
+
+.smallCaps {
+  font-size: 117%;
+  font-variant: small-caps;
+}
+
+
+/* ##### Header ##### */
+
+#header {
+  color: inherit;
+  background-color: rgb(210,198,170);
+}
+
+.headerTitle {
+  margin: 0;
+  padding: 0.25em 4mm 0.25em 4mm;
+  font-style: italic;
+}
+
+.header {
+  margin-top: 0;
+  font-style: italic;
+}
+
+.headerTitle a {
+  color: black;
+  background-color: transparent;
+  text-decoration: none;
+  font-size: 110%;  /* For MSIE */
+  font-weight: bold;
+  font-style: italic;
+}
+
+.headerTitle > a {
+  font-size: 138%;  /* For fully standards-compliant user agents */
+}
+
+.headerTitle span {
+  color: white;
+  background-color: transparent;
+  font-weight: normal;
+}
+
+.subHeader {
+  color: white;
+  background-color: black;
+  font-size: 109%;
+  text-align: center;
+  margin: 0;
+  padding: 0.5ex 0;
+}
+
+.subHeader a {
+  color: white;
+  background-color: black;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 1ex;
+}
+
+.subHeader a:hover {
+  color: black;
+  background-color: white;
+}
+
+
+/* ##### Left Side Bar ##### */
+
+.leftSideBar {
+  width: 12.5em;
+  float: left;
+  clear: left;
+}
+
+.leftSideBar .sideBarTitle {
+  color: rgb(64,64,64);
+  background-color: rgb(230,223,207);
+  font-weight: bold;
+  margin: 0;
+  padding: 0.8ex 1ex;
+}
+
+.leftSideBar ul {
+  list-style-type: none;
+  list-style-position: outside;
+  margin: 0 0 1em 0;
+  padding: 0;
+}
+
+.leftSideBar li {
+  margin: 1ex;
+  padding: 0 0 1.25ex 0.75ex;
+}
+
+.leftSideBar a {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.leftSideBar a:hover {
+  color: rgb(64,64,64);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.leftSideBar .sideBarText {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  line-height: 1.25em;
+  margin: 1ex 0.25ex 1.5em 0.75ex;
+  padding: 0;
+  display: block;
+}
+
+.leftSideBar .sideBarText a {
+  text-decoration: underline;
+}
+
+.leftSideBar .sideBarText a:hover {
+  text-decoration: none;
+}
+
+.leftSideBar .thisPage {
+  color: rgb(64,64,64);
+  background-color: transparent;
+  font-weight: bold;
+}
+
+
+/* ##### Right Side Bar ##### */
+
+.rightSideBar {
+  width: 13em;
+  margin: 2ex 0.75ex 0 0;
+  padding: 0;
+  float: right;
+  clear: right;
+  border: 1px solid rgb(216,210,195);
+}
+
+[class~="rightSideBar"] {
+  margin-right: 1.5ex;
+}
+
+.rightSideBar .sideBarTitle {
+  color: black;
+  background-color: rgb(230,223,207);
+  font-weight: bold;
+  margin: 1.25ex 1ex;
+  padding: 0.9ex 1ex;
+}
+
+.rightSideBar a {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.rightSideBar a:hover {
+  text-decoration: none;
+}
+
+.rightSideBar .sideBarText {
+  line-height: 1.5em;
+  margin: 0;
+  padding: 0 2ex 1em 2ex;
+}
+
+.rightSideBar .more {
+  text-decoration: none;
+  text-align: right;
+  margin: 0;
+  padding: 0 2ex 1em 2ex;
+  display: block;
+}
+
+.rightSideBar .more:hover {
+  text-decoration: underline;
+}
+
+
+/* ##### Main Copy ##### */
+
+#main-copy {
+  color: black;
+  background-color: white;
+  text-align: justify;
+  line-height: 1.5em;
+  margin: 0 0 0 12.5em;
+  padding: 0.5ex 15em 1em 1em;
+  border-left: 1px solid rgb(216,210,195);
+}
+
+#main-copy h1 {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  font-family: arial, verdana, helvetica, sans-serif;
+  font-size: 175%;
+  font-weight: bold;
+  font-style: italic;
+  text-align: left;
+  margin: 1em 0 0 0;
+  padding: 1em 0 0 0;
+  border-top: 1px solid rgb(216,210,195);
+}
+
+#main-copy h2 {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  font-family: arial, verdana, helvetica, sans-serif;
+  font-size: 140%;
+  font-weight: bold;
+  text-align: left;
+  margin: 1em 0 0 0;
+  padding: 1em 0 0 0;
+}
+
+#main-copy h3 {
+  color: rgb(166,140,83);
+  background-color: transparent;
+  font-family: arial, verdana, helvetica, sans-serif;
+  font-size: 110%;
+  text-align: left;
+  font-style: italic;
+  margin: 1em 0 0 0;
+  padding: 1em 0 0 0;
+}
+
+#main-copy a {
+  color: rgb(168,140,83);
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+#main-copy a:hover {
+  text-decoration: none;
+}
+
+p {
+  margin: 1em 0 1.5em 0;
+  padding: 0;
+}
+
+dt {
+  font-weight: bold;
+  margin: 0;
+  padding: 0 0 0.5ex 0;
+}
+
+dd {
+  margin: 0 0 1.5em 1.5em;
+  padding: 0;
+}
+
+#main-copy code {
+  font-family: monospace;
+}
+
+pre.code {
+  font-size: 1em;
+  border: 1px dashed rgb(210,198,170);
+  background-color: rgb(243,242,235);
+  color: #000000;
+  padding: 10px;
+  margin-bottom: 0.5em;
+  margin-top: 2em;
+  margin-left: 0;
+  margin-right: 0.5em;
+}
+
+#main-copy .code-inline {
+  font-family: monospace;
+}
+
+
+/* ##### Footer ##### */
+
+#footer {
+  color: black;
+  background-color: rgb(230,223,207);
+  font-size: 92%;
+  text-align: center;
+  line-height: 1.25em;
+  margin: 0;
+  padding: 1em 4mm 1em 4mm;
+  clear: both;
+}
+
+#footer div {
+  margin: 0;
+  padding: 0 0 1ex 0;
+}
+
+#footer span.cvs {
+  color: rgb(129,129,129);
+  float: left;
+  clear: left;
+}
+
+#footer span.webdesign {
+  color: rgb(129,129,129);
+  float: right;
+  clear: right;
+}
+
+#footer span.webdesign a{
+  color: rgb(129,129,129);
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+#footer a {
+  color: black;
+  background-color: transparent;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#footer a:hover {
+  text-decoration: none;
+}
+
+/* ##### Site map ##### */
+#sitemap ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style-type: none;
+}
+
+#sitemap ul li {
+  background-color: rgb(230,223,207);
+  margin: 2ex 2ex 1ex 1ex;
+  padding: 1ex 1ex 0ex 1ex;
+  border: 1px solid rgb(216,210,195);
+  font-weight: bold;
+}
+
+#sitemap ul ul {
+  background-color: white;
+  margin: 0 0 1ex 30ex;
+  padding: 1ex 0 1ex 0;
+  border: none;
+  list-style-type: none;
+}
+
+#sitemap ul ul li {
+  background-color: white;
+  margin: 1ex 1ex 1ex 1ex;
+  padding: 0ex 0ex 0ex 1ex;
+  border: none;
+  font-weight: normal;
+}

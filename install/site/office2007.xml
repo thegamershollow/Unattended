@@ -1,0 +1,10 @@
+<Configuration Product="Enterprise">
+
+    <PIDKEY Value="XXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
+    <Display Level="none" CompletionNotice="no" SuppressModal="yes" AcceptEula="yes" />
+    <Logging Type="verbose" Path="%temp%" Template="Microsoft Office Enterprise Setup(*).txt" />
+    <COMPANYNAME Value=" Unknown Corporation " />
+    <INSTALLLOCATION Value="%programfiles%\Microsoft Office" />
+
+</Configuration>
+

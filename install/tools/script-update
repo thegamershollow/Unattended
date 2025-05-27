@@ -1,0 +1,72 @@
+#!/bin/bash
+
+#
+# This script updates your script files from the official
+# unattended repository.
+#
+# This scripts crawles through your script directory, and
+# tries to update every found file from the repository. You can
+# define exceptions in this script.
+#
+# Warning #1: this scripts overwrites YOUR changes to official
+# script files without any warning! Please double-check that
+# none of your own-written scripts accidentially have the same
+# name than any of the official scripts.
+#
+# Warning #2: it does not add scripts in the repository that are
+# not found in your script directory. You have to download
+# new scripts once manually.
+#
+# Warning #3: you might want to call it as cron job, but
+# please be not surprised by broken scripts.
+# This happens from time to time.
+#
+
+#  you can write exceptions like this:
+# exceptions=( "win2ksp4-updates.bat" "win2ksp4-symbols.bat" )
+exceptions=( )
+
+# HTTP-Link to the cvs-repository
+SVNLINK="https://unattended.svn.sourceforge.net/svnroot/unattended/trunk/install/scripts"
+
+# paths to needed programs
+WGET=$(which wget)
+FIND=$(which find)
+GREP=$(which grep)
+SORT=$(which sort)
+SVN=$(which svn)
+
+# Change to the scripts directory so paths are correct
+cd "$(dirname "$0")"/../scripts
+
+
+if [ ! -f $SVN ]
+then
+   echo \****** INSTALL SVN ON YOUR SYSTEM *************\*
+fi
+
+#If there is SVN information when use svn as it has better support
+if [ -d .svn ]
+then
+    $SVN up
+    exit 0
+else
+    echo \****** MISING SVN INFO *************\*
+    echo \*            RUN:
+    echo \*   mv scripts scripts.old
+    echo \*   svn co $SVNLINK scripts 
+    echo \****** MISING SVN INFO *************\*
+fi
+
+
+# crawl through the script-dir
+for file in $($FIND . -type f -name "*.bat" | $GREP -v .svn | $SORT)
+do
+    if [[ "${exceptions[@]%%${file##./}}" != "${exceptions[@]}" ]]; then continue; fi
+    if $WGET $1 --output-document "$file.$$.tmp" $SVNLINK/$file
+    then
+        mv "$file.$$.tmp" "$file"
+    else
+        rm -f "$file.$$.tmp"
+    fi
+done

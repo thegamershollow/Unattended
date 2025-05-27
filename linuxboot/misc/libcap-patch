@@ -1,0 +1,32 @@
+diff -u1 -r /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/Makefile libcap-1.10/libcap/Makefile
+--- /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/Makefile	1999-04-18 00:16:31.000000000 +0200
++++ libcap-1.10/libcap/Makefile	2007-03-26 16:31:45.000000000 +0200
+@@ -52,6 +52,5 @@
+ 
+-cap_names.sed: Makefile /usr/include/linux/capability.h
++cap_names.sed: Makefile $(topdir)/../linux-2.6.21.1/include/linux/capability.h
+ 	@echo "=> making cap_names.c from <linux/capability.h>"
+-	@sed -ne '/^#define[ \t]CAP[_A-Z]\+[ \t]\+[0-9]\+/{s/^#define \([^ \t]*\)[ \t]*\([^ \t]*\)/  \{ \2, \"\1\" \},/;y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/;p;}' < /usr/include/linux/capability.h | fgrep -v 0x > cap_names.sed
+-#	@sed -ne '/^#define[ \t]CAP[_A-Z]\+[ \t]\+[0-9]\+/{s/^#define CAP_\([^ \t]*\)[ \t]*\([^ \t]*\)/  \{ \2, \"\1\" \},/;y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/;p;}' < /usr/include/linux/capability.h | fgrep -v 0x > cap_names.sed
++	@sed -ne '/^#define[ \t]CAP[_A-Z]\+[ \t]\+[0-9]\+/{s/^#define \([^ \t]*\)[ \t]*\([^ \t]*\)/  \{ \2, \"\1\" \},/;y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/;p;}' < $(topdir)/../linux-2.6.21.1/include/linux/capability.h | fgrep -v 0x > cap_names.sed
+ 
+diff -u1 -r /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/_makenames.c libcap-1.10/libcap/_makenames.c
+--- /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/_makenames.c	1999-05-14 06:46:15.000000000 +0200
++++ libcap-1.10/libcap/_makenames.c	2007-03-27 09:20:29.000000000 +0200
+@@ -11,3 +11,4 @@
+ #include <stdlib.h>
+-#include <linux/capability.h>
++#include <sys/capability.h>
++/*#include <linux/capability.h>*/
+ 
+diff -u1 -r /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/cap_sys.c libcap-1.10/libcap/cap_sys.c
+--- /mnt/prgdist/unattend/cvs/unattended/linuxboot/libcap-1.10/libcap/cap_sys.c	1999-04-18 00:16:31.000000000 +0200
++++ libcap-1.10/libcap/cap_sys.c	2007-03-27 09:16:52.000000000 +0200
+@@ -13,2 +13,3 @@
+ 
++/*
+ _syscall2(int, capget,
+@@ -20,2 +21,3 @@
+ 	  const cap_user_data_t, data)
++*/
+ 

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta name="keywords" content="silent install, silent installation,
+unattended" />
+<link href="Unattended.css" rel="stylesheet" type="text/css" />
+<title>PXE Setup without RIS on Windows 2000 Server</title>
+</head>
+
+<body>
+
+<p><a href="http://validator.w3.org/check?uri=referer"><img class="logo"
+src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!"
+height="31" width="88" /></a>
+
+This document is part of <a
+href="http://unattended.sourceforge.net/">Unattended, a Windows
+deployment system</a>.
+</p>
+
+<hr />
+
+<p>It is possible to setup a PXE server on Widows 2000 server without
+installing RIS.  Do all of this on whatever machine is serving
+DHCP.</p>
+
+<h1>DHCP Configuration</h1>
+
+<ol>
+
+<li>Open the DHCP control panel from administrative tools.</li>
+
+<li>Expand the server you are wanting to configure.  Expand the
+"Scope" folder.  Right click on "Scope Options" and select "Configure
+Options".</li>
+
+<li>Put a check mark in "013 Boot File Size" and enter the file size
+in 512 octet blocks.  Example, your boot image file is 12 KB
+(kilobytes).  Convert 12 KB to bytes (12288).  This must be exact,
+don't just multiply 12 by 1000.  Divide the file size in bytes by 512
+(12288 / 512).  Enter the resulting number (24) in the text dialog
+that is enabled when you put a check in 013.</li>
+
+<li>Put a check mark in "043 Vendor Specific Info" and enter the
+following binary value:
+<code>01&nbsp;04&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;ff</code>.</li>
+
+<li>Open a command window and type the following:
+<pre>
+c:\>netsh
+netsh>dhcp
+netsh dhcp>server \\server_name
+netsh dhcp server>add optiondef 60 ClassID String 0
+netsh dhcp server>set optionvalue 60 STRING PXEClient
+</pre>
+</li>
+
+<li>Put a check mark in "066 Boot Server Host Name" and enter the IP
+address of the server.</li>
+
+<li>Put a check mark in "067 Bootfile Name" and enter the name of the
+boot image file.</li>
+
+<li><p>(Thanks to Mark McRitchie for this step.)</p>
+
+<p>If you use the Linux-based boot disk, you can set the boot disk's
+defaults (user name, password, share) via DHCP option 233.  Open a
+command prompt and type:</p>
+
+<pre>
+netsh dhcp server add optiondef 233 Unattended String 0 comment="Unattended dhcp info"
+</pre>
+
+<p>Go back to "Scope Options", select configure options, put a check
+mark next to the new entry, and fill in the boot disk options you want
+to use (e.g.,
+<code>z_user=username&nbsp;z_pass=sekrit&nbsp;z_path=\\myserver\myshare</code>).</p>
+
+</li>
+
+<li>Right click on the server name in the DHCP control panel, go to
+all tasks, and select "restart".</li>
+
+<li>Go back to scope options and verify that all the information is
+there.  You should see the five entries on the right.  They should
+look like this:
+<pre>
+
+013  Boot File Size             Standard        0x18
+043  Vendor Specific Info       Standard        01 04 00 00 00 00 ff
+060  ClassID                    Standard        PXEClient
+066  Boot Server Host Name      Standard        Server IP address
+067  Bootfile Name              Standard        bzImage (boot file name)
+</pre>
+
+<p>If any of the options do not match these, double-click on the
+option and change the value.  More than likely option 060 will be
+wrong.  Change it so it looks like above.</p>
+</li>
+
+</ol>
+
+<p>You are now ready to set up tftp.</p>
+
+<h1>TFTP Configuration</h1>
+
+<ol>
+<li>Copy "tftpd.exe" from "c:\winnt\system32\dllcache\tftpd.exe" to
+"c:\winnt\system32\tftpd.exe"</li>
+
+<li>Get a copy of "sc.exe" from the system32 folder on any windows xp
+box and place it in "c:\winnt\system32"</li>
+
+<li>Open a command window and type "sc create tftpd binpath=
+c:\winnt\system32\tftpd.exe "</li>
+
+<li>The service "tftpd" is now available in the service control panel.
+Open the control panel, find the service, and start it.  (If you want
+it to start automatically, you can set it to do so from the control
+panel.)</li>
+
+<li>Open the registry to the following key.
+\\hkey_local_machine\system\currentControlSet\services\tftpd.  Add a
+subkey "parameters" to the tftpd folder.  Add a string value
+"Directory" to the "parameters" key.  Give "Directory" the path
+location where your boot image file is located. (example c:\tftpd).</li>
+
+</ol>
+
+<p>Much of this is adapted from <a
+href="http://pxes.sourceforge.net/howtos/ms_only_environment/">Willis
+Doiron's nice document</a>.
+</p>
+
+<p>Thanks to Tyler Hepworth for the original version of this
+document.</p>
+
+<hr />
+
+<p><a href="http://sourceforge.net/"><img class="logo"
+src="http://sourceforge.net/sflogo.php?group_id=62053&amp;type=5"
+width="210" height="62" alt="SourceForge Logo" /></a>
+
+</p>
+
+<address>
+Patrick J. LoPresti <a
+href="mailto:patl@users.sourceforge.net">patl@users.sourceforge.net</a>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+; AutoIt script to defragment primary drive
+
+Run, %SystemRoot%\\system32\\mmc.exe %SystemRoot%\\system32\\dfrg.msc
+
+WinWait, Schijfdefragmentatie
+WinActivate, Schijfdefragmentatie
+Send, !ad
+
+; Stupid Microsoft changed the GUI on this tool from 2000 to XP.  This
+; is a bad hack which happens to work with either.
+SetTitleMatchMode, 2
+WinWait, efragment, uiten
+WinActivate, efragment, uiten
+WinClose, efragment, uiten
+WinWaitClose, efragment, uiten
+
+WinActivate, Schijfdefragmentatie
+WinClose, Schijfdefragmentatie
+WinWaitClose, Schijfdefragmentatie

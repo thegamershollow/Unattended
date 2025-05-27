@@ -1,0 +1,20 @@
+LASTDRIVE=Z
+DOS=HIGH,UMB
+
+;; Pick exactly one of these XMS providers
+DEVICE=himem.exe
+;DEVICE=himem.sys /testmem:off
+
+;; Pick zero or one of these UMB providers
+;DEVICE=umbpci.sys
+;DEVICE=emm386.exe NOEMS X=TEST
+
+;; Pick exactly one of these CD drivers 
+;; this standard FreeDOS driver, but it doesn't work for me
+;DEVICEHIGH=ATAPICDD.SYS /D:FDCD001
+;DEVICE=VIDE-CDD.SYS /D:FDCD001
+DEVICE=QCDROM.SYS /D:FDCD001
+
+;; Required for installing XP under VMware.  Thanks to Scott Card for
+;; figuring this out.
+FILES=30

@@ -1,0 +1,51 @@
+; General user information
+[UserData]
+
+[GuiUnattended]
+    ; See <http://unattended.sourceforge.net/timezones.html>
+    TimeZone=35
+    OEMSkipRegional=1
+    OemSkipWelcome=1
+
+[Unattended]
+    DriverSigningPolicy=Ignore
+    UnattendMode=DefaultHide
+    FileSystem=ConvertNTFS
+    ExtendOemPartition=1
+    OemSkipEula=Yes
+    OemPreinstall=Yes
+    ; Needed for XP - see <http://support.microsoft.com/?kbid=294801>.
+    UnattendSwitch=Yes
+
+[Components]
+    ; Install IIS by default
+    iis_common=On
+    iis_inetmgr=On
+    iis_www=On
+    ; Docs suggest iis_pwmgr only works on Win2k, but include it
+    ; anyway
+    iis_pwmgr=On
+    ; Include docs
+    iis_doc=On
+
+[Data]
+    AutoPartition=1
+    MsDosInitiated="0"
+    UnattendedInstall=Yes
+
+[Display]
+    BitsPerPel=32
+    Xresolution=1024
+    YResolution=768
+    Vrefresh=75
+
+[LicenseFilePrintData]
+    AutoMode=PerServer
+    AutoUsers=5
+
+[Networking]
+    InstallDefaultComponents=Yes
+
+[NetOptionalComponents]
+    ; Install Print Services for UNIX
+    LPDSVC=1

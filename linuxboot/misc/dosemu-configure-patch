@@ -1,0 +1,14 @@
+dosemu/unattended: bypass --with-slangdir configure option; instead,
+allow distinct settings of Include and Lib for S-LANG.
+
+--- dosemu-1.4.0/configure.orig	2007-05-03 08:26:28.000000000 +0200
++++ dosemu-1.4.0/configure	2009-03-10 07:58:02.000000000 +0100
+@@ -6645,6 +6645,8 @@
+     SLANGLIB="-L${with_slangdir}/lib"
+   fi
+ fi
++SLANGINC="-I${with_slang_inc}"
++SLANGLIB="-L${with_slang_lib}"
+ CPPFLAGS="$CPPFLAGS $SLANGINC"
+ { echo "$as_me:$LINENO: result: $SLANGINC $SLANGLIB" >&5
+ echo "${ECHO_T}$SLANGINC $SLANGLIB" >&6; }

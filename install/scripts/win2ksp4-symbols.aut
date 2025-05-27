@@ -1,0 +1,25 @@
+; AutoIt script to install Windows 2000 SP4 symbols
+; URL|DEU|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_de.exe|updates/win2ksp4/w2ksp4sym_deu.exe
+; URL|ENU|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_en.exe|updates/win2ksp4/w2ksp4sym_enu.exe
+; URL|ESN|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_es.exe|updates/win2ksp4/w2ksp4sym_esn.exe
+; URL|ITA|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_it.exe|updates/win2ksp4/w2ksp4sym_ita.exe
+; URL|FRA|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_fr.exe|updates/win2ksp4/w2ksp4sym_fra.exe
+; URL|NLD|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_nl.exe|updates/win2ksp4/w2ksp4sym_nld.exe
+; URL|NOR|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_no.exe|updates/win2ksp4/w2ksp4sym_nor.exe
+; URL|RUS|http://msdl.microsoft.com/download/symbols/packages/windows2000/sp4/w2ksp4sym_ru.exe|updates/win2ksp4/w2ksp4sym_rus.exe
+
+Run, %Z%\\updates\\win2ksp4\\w2ksp4sym_%WINLANG%.exe
+
+WinWait, License
+Send, {TAB}{ENTER}
+
+WinWait, Microsoft Windows, Symbols install directory
+Send, {ENTER}
+
+; "Directory xxx does not exist.  Do you want to create it?"
+; Time this one out after fifteen seconds (yuck)
+WinWait, Microsoft Windows, Do you want to create it?, 15
+Send, {ENTER}
+
+WinWait, Microsoft Windows, Installation is complete
+Send, {ENTER}

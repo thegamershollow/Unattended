@@ -1,0 +1,36 @@
+; AutoIt script to install Cygwin
+; URL|ALL|http://www.cygwin.com/setup.exe|packages/cygwin/setup.exe
+; Download cygwin installer (setup.exe). Select and download everything
+; that you want installed.  Store in /packages/cygwin.  Everything in
+; that directory will be installed.
+
+Run, %Z%\\packages\\cygwin\\setup.exe
+
+WinWait, Cygwin Setup
+Send, {ENTER}
+
+WinWait, Cygwin Setup - Choose Installation Type
+; Choose "Install from Local Directory"
+Send, !l{ENTER}
+
+WinWait, Cygwin Setup - Choose Installation Directory
+Send, {ENTER}
+
+WinWait, Cygwin Setup - Select Local Package Directory, Select Local Package Directory
+; Use proper package directory
+Send, %Z%\\packages\\cygwin{ENTER}
+
+WinWait, Cygwin Setup - Select Packages
+; Make sure the Window is active, then click in the right place to
+; select "install all"
+WinActivate, Select Packages
+LeftClick, 70, 135
+
+; Wait ten seconds to ensure selection is noticed (yuck)
+Sleep, 10000
+Send, {ENTER}
+
+WinWait, Cygwin Setup - Installation Status and Create Icons
+Send, {ENTER}
+
+WinWaitClose, Cygwin Setup, Installation Status and Create Icons

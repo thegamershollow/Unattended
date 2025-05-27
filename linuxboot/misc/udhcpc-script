@@ -1,0 +1,53 @@
+#!/bin/bash
+
+arg="$1"
+
+case $arg in
+    deconfig)
+        ifconfig $interface 0.0.0.0
+        ;;
+    bound)
+        [ -n "$subnet" ] && subnet="netmask $subnet"
+        [ -n "$broadcast" ] && broadcast="broadcast $broadcast"
+        echo "Running ifconfig $interface $ip $subnet $broadcast" >&2
+        ifconfig $interface $ip $subnet $broadcast
+        for router in $router ; do
+            route add default gw $router
+        done
+
+        # Create /etc/resolv.conf
+        [ -n "$domain" ] && echo "search $domain" >| /etc/resolv.conf.tmp
+        for dns_server in $dns ; do
+            echo "nameserver $dns_server" >> /etc/resolv.conf.tmp
+        done
+        mv /etc/resolv.conf.tmp /etc/resolv.conf
+
+        # Create smb.conf (WINS servers)
+        if [ -n "$wins" ] ; then
+            echo "wins server = $wins" > /usr/lib/smb.conf.tmp
+            mv /usr/lib/smb.conf.tmp /usr/lib/smb.conf
+        fi
+
+        # Set our hostname if DHCP provided it
+        [ -n "$hostname" ] && hostname "$hostname"
+
+        # Create /tmp/dhcp.out
+        dhcp_out=/tmp/dhcp.out
+        echo "interface=$interface" >| $dhcp_out.tmp
+        echo "ip=$ip" >> $dhcp_out.tmp
+        [ -n "$unattend" ] \
+            && echo "unattend='$unattend'" >> $dhcp_out.tmp
+        mv $dhcp_out.tmp $dhcp_out
+        # set > /tmp/dhcp-set.out   # for debugging
+        ;;
+    renew)
+        echo "$0: ERROR: RENEW NOT IMPLEMENTED" >&2
+        exit 1
+        ;;
+    nak)
+        echo "$0: ERROR: DHCP server gave NAK" >&2
+        exit 2
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,11 @@
+--- zlib-1.2.5/Makefile.in~	2010-04-19 21:12:21.000000000 -0700
++++ zlib-1.2.5/Makefile.in	2010-05-21 11:46:32.055553379 -0700
+@@ -136,7 +136,7 @@ minigzip64.o: minigzip.c zlib.h zconf.h
+ 	$(CC) $(SFLAGS) -DPIC -c -o objs/$*.o $<
+ 	-@mv objs/$*.o $@
+ 
+-$(SHAREDLIBV): $(PIC_OBJS)
++$(SHAREDLIBV): $(PIC_OBJS) $(STATICLIB)
+ 	$(LDSHARED) $(SFLAGS) -o $@ $(PIC_OBJS) $(LDSHAREDLIBC) $(LDFLAGS)
+ 	rm -f $(SHAREDLIB) $(SHAREDLIBM)
+ 	ln -s $@ $(SHAREDLIB)

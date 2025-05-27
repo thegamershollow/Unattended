@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Change to the scripts directory so paths are correct
+cd "$(dirname "$0")"/..
+
+# Default to ENU if nothing passed in as first arg
+if [ ".$1" == "." ]; then WINLANG="ENU"; else WINLANG="$1"; fi
+
+# Default to all files if nothing passed in as second arg
+if [ ".$2" == "." ]; then DOFILE="*"; else DOFILE="$2"; fi
+
+for a in `egrep -Hri '^(run|start|todo).*(packages|updates)\\\\' scripts/$DOFILE | sed "s/%WINLANG%/$WINLANG/g" | perl -pe 's#scripts/(.*?):.*?((packages|updates)\\\\.*?\.([a-zA-Z]{3})).*#$1:$2#;s#\\\\#/#g;s#//#/#g' | tr ' [:upper:]' '~[:lower:]' | sort | egrep -vi '^(run|start|todo)'`
+do 
+    a=`echo $a | tr '~' ' '`
+    if ! [ -r "`echo $a | cut -d':' -f2`" ]
+    then 
+        echo $a
+    fi
+done

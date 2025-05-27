@@ -1,0 +1,97 @@
+#!/bin/bash -e
+
+# Arguments are high, middle, and low byte of PCI class to match.  All
+# three arguments are optional.
+
+declare -i master_class=0 master_class_mask=0
+
+# Process numeric arguments
+for arg in "$1" "$2" "$3" ; do
+    temp=${arg:-0}
+    master_class=$((256*$master_class + $temp))
+    temp=${arg:+255}
+    temp=${temp:-0}
+    master_class_mask=$((256*$master_class_mask + $temp))
+done
+
+unset arg temp
+
+printf "Looking for PCI devices of class 0x%06X (mask 0x%06X)\n" \
+    $master_class $master_class_mask >&2
+
+# Brazenly stolen from pci_map_modules function in
+# etc/hotplug/pci.agent from Linux hotplug utilities
+map_modules_pci ()
+{
+    local -i vendor=$1 device=$2 subvendor=$3 subdevice=$4 class=$5
+
+    local -i cmp_vendor cmp_device cmp_subvendor cmp_subdevice cmp_class \
+        cmp_class_mask
+    local module
+
+    local -i pci_any=0xffffffff
+
+    local ret
+
+    # look at each pci_device_id entry
+    # collect one match in $DRIVERS
+    while read module cmp_vendor cmp_device cmp_subvendor \
+        cmp_subdevice cmp_class cmp_class_mask ignored
+    do
+	# comments are lines that start with "#" ...
+	# be careful, they still get parsed by bash!
+#	case "$module" in
+#	\#*) continue ;;
+#	esac
+
+	if [ $cmp_vendor -ne $pci_any -a $cmp_vendor -ne $vendor ]; then
+	    continue
+	fi
+
+	if [ $cmp_device -ne $pci_any -a $cmp_device -ne $device ]; then
+	    continue
+	fi
+
+	if [ $cmp_subvendor -ne $pci_any \
+            -a $cmp_subvendor -ne $subvendor ]; then
+	    continue
+	fi
+
+	if [ $cmp_subdevice -ne $pci_any \
+            -a $cmp_subdevice -ne $subdevice ]; then
+	    continue
+	fi
+
+	local -i class_temp="$class & $cmp_class_mask"
+	if [ $class_temp -eq $cmp_class ]; then
+            echo $module
+	fi
+    done
+}
+
+module_dir=/lib/modules/`uname -r`
+[ -d $module_dir ] || { echo "$module_dir not a directory!?" ; exit 1 ; }
+
+sys_dir=/sys/bus/pci/devices
+cd ${sys_dir}
+
+for entry in * ; do
+    vendor=`cat $entry/vendor`
+    device=`cat $entry/device`
+    subvendor=`cat $entry/subsystem_vendor`
+    subdevice=`cat $entry/subsystem_device`
+    class=`cat $entry/class`
+    bus_slot_func="${entry#*:}"
+
+    if [ $(($master_class_mask & $class)) != $master_class ] ; then
+        continue;
+    fi
+
+    lspci -n -s "$bus_slot_func" >&2
+    lspci -s "$bus_slot_func" >&2
+
+    cat /etc/extra.pcimap $module_dir/modules.pcimap \
+        | sed -e /^\#/d -e /^\$/d \
+        | map_modules_pci $vendor $device $subvendor $subdevice $class
+
+done

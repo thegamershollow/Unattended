@@ -1,0 +1,81 @@
+# List of files which must not be moved to the network share
+
+init
+
+.dosemu
+
+bin/ash
+bin/bash
+bin/busybox
+bin/find-modules-pci
+bin/gzip
+bin/loadkeys
+bin/lsmod
+bin/rmmod
+bin/modinfo
+bin/mkdir
+bin/mount
+bin/sh
+
+etc/extra.pcimap
+etc/ld.so.cache
+etc/master
+etc/version
+
+etc/modprobe.conf
+etc/module-order.txt
+etc/nsswitch.conf
+etc/passwd
+etc/pcmcia
+etc/udhcpc-script
+
+#Make the linuxboot less depent on the linuxaux
+lib
+usr
+var
+
+#lib/ld-linux.so
+#lib/libc.so
+#lib/libcap.so.1 # Samba
+#lib/libm.so
+#lib/libcrypt.so # Samba
+#lib/libdl.so
+#lib/libnsl.so   # Samba
+#lib/libnss_dns.so
+#lib/libnss_files.so
+#lib/libresolv.so
+#lib/librt.so
+#lib/libz.so  # lspci
+
+# Should not hard-wire kernel version here.  FIXME!
+#lib/modules/2.6.25
+
+sbin/acpidump
+sbin/cardmgr
+sbin/insmod
+sbin/iwconfig
+sbin/iwlist
+sbin/lspci
+sbin/modprobe
+
+bin/openvt
+
+# Samba junk
+sbin/mount.cifs
+#usr/bin/smbmnt
+#usr/bin/smbmount
+#usr/lib/charset
+#usr/lib/smb.conf
+#usr/lib/lowcase.dat
+#usr/lib/upcase.dat
+#usr/lib/valid.dat
+
+usr/share/keymaps/i386/
+#Some keymaps need include as well
+usr/share/keymaps/include/
+
+#usr/share/pci.ids
+
+#usr/var/locks
+
+var/run

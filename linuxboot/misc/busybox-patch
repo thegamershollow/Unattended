@@ -1,0 +1,19 @@
+--- busybox-1.24.2/networking/udhcp/common.ori	2016-05-21 01:59:39.147583627 +0200
++++ busybox-1.24.2/networking/udhcp/common.c	2016-05-21 01:59:44.895621863 +0200
+@@ -65,6 +65,8 @@
+ 	{ OPTION_STRING                           , 0xd1 }, /* DHCP_PXE_CONF_FILE */
+ 	{ OPTION_STRING                           , 0xd2 }, /* DHCP_PXE_PATH_PREFIX */
+ 	{ OPTION_6RD                              , 0xd4 }, /* DHCP_6RD           */
++//* Steal "local" option 0xe9 (decimal 233) for Unattended */
++        { OPTION_STRING               | OPTION_REQ, 0xe9 }, /* unattend
+ 	{ OPTION_STATIC_ROUTES | OPTION_LIST      , 0xf9 }, /* DHCP_MS_STATIC_ROUTES */
+ 	{ OPTION_STRING                           , 0xfc }, /* DHCP_WPAD          */
+ 
+@@ -133,6 +135,7 @@
+ 	"pxeconffile" "\0" /* DHCP_PXE_CONF_FILE  */
+ 	"pxepathprefix" "\0" /* DHCP_PXE_PATH_PREFIX  */
+ 	"ip6rd" "\0"       /* DHCP_6RD            */
++        "unattend" "\0"
+ 	"msstaticroutes""\0"/* DHCP_MS_STATIC_ROUTES */
+ 	"wpad" "\0"        /* DHCP_WPAD           */
+ 	;

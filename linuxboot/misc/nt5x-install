@@ -1,0 +1,230 @@
+#!/bin/bash
+#
+# This file is released under GPL version 2
+# Mari Gzuk is the orginal author and therefore the copyright holder.
+# The file is taken from the unattended-gui project, namely the unattended-nodosemu script.
+# See http://unattended.technikz.de or http://unattended-gui.sourceforge.net
+# for more info on Marios unattended-gui project
+#
+# see also Marios writeup on how this work: 
+# http://unattended-gui.sourceforge.net/wiki/index.php?title=Win:installation_process
+#
+# Adapted to the unattended.sf.net project december 2007, Nils Olav Fossum
+#
+
+BINARYDIR="/usr/lib/ntldrbin"
+LOGTTY=/dev/tty4
+
+echo -e "\n\E[1;32m----------- \E[1;33m $0 \E[1;32m-----------\E[0;37m"
+
+function message()
+	{
+	echo -e "\E[1;34m*\E[1;37m $1\E[0;37m"
+	}
+
+function die ()
+	{
+	echo -e "\E[1;31m$@\E[1;37m"
+	message "Dropping to shell"
+	exec /bin/bash
+	}
+
+
+function copy_files ()
+        {
+        #$1 = file or directory
+        #$2 = destination
+        #$3 = 1 complete directory and subdirs
+        #$3 = 2 only content from directory
+        #$3 = 3 only file
+        #$4 = title
+        DIR=${1%/}
+	DIR="$DIR/"
+        case "$3" in
+                "1")
+		message "$4 ($1 $2)"
+		#check if directory exist
+		DESTINATIONDIR="$2/`basename $1`"
+		if [ ! -d $DESTINATIONDIR ]
+		then
+			 mkdir -p "$DESTINATIONDIR" 
+		fi
+                cp -Lr "$1" "$2" || die "recursive directory copy failed"
+                ;;
+                "2")
+		message "$4 ($1 $2)"
+                cp "$1"* "$2" > $LOGTTY 2>&1 
+		# FIXME cp exits nonzero for some reason - die "nonrecursive directory copy failed"
+                ;;
+                "3")
+		message "$4 ($1 $2)"
+		cp "$1" "$2" || die "file copy failed"
+                ;;
+                *)
+                #option not given dont do anything...
+                ;;
+        esac
+	sync #  free memory caches, everything is going to disk anyway
+        }
+
+
+#source function lib
+. /usr/lib/unatt-functions.sh || die "Can not parse shell function lib (/usr/lib/unatt-functions.sh)"
+
+BOOTNUMBER=`parted /dev/dsk print | grep "boot" | awk '{print $1}'`
+
+
+fix_disk_geo_heads=`parse_ini_file /c/netinst/unattend.txt _meta fix_disk_geo_heads`
+if [ -n "$fix_disk_geo_heads" ] ; then
+   message "We have fix_disk_geo_heads ($fix_disk_geo_heads), writing into /dev/dsk$BOOTNUMBER"
+   echo -e -n "\x`printf "%02X" $fix_disk_geo_heads`"|dd of=/dev/dsk$BOOTNUMBER bs=1 seek=26 conv=notrunc > $LOGTTY 2>&1\
+       || die "could not write fix_disk_geo_heads into /dev/dsk$BOOTNUMBER"
+fi
+
+fix_disk_geo_sectors=`parse_ini_file /c/netinst/unattend.txt _meta fix_disk_geo_sectors`
+if [ -n "$fix_disk_geo_sectors" ] ; then
+   message "We have fix_disk_geo_sectors ($fix_disk_geo_sectors), writing into /dev/dsk$BOOTNUMBER"
+   echo -e -n "\x`printf "%02X" $fix_disk_geo_sectors`"|dd of=/dev/dsk$BOOTNUMBER bs=1 seek=24 conv=notrunc > $LOGTTY 2>&1\
+       || die "could not write fix_disk_geo_sectors into /dev/dsk$BOOTNUMBER"
+fi
+
+message "Saving existing disk geometry for /dev/dsk$BOOTNUMBER"
+#..because the premade ntldr_boot_code_sektor0 will overwrite existing partition disk geometry.
+dd if=/dev/dsk$BOOTNUMBER of=/c/netinst/partgeo.bin bs=1 skip=24 count=4 > $LOGTTY 2>&1\
+   || die "could not save disk geometry for /dev/dsk$BOOTNUMBER"
+
+message "Writing ntldr_boot_code_sektor0 into /dev/dsk$BOOTNUMBER"
+dd if=$BINARYDIR/ntldr_boot_code_sektor0 of=/dev/dsk$BOOTNUMBER bs=1 count=420 seek=90 > $LOGTTY 2>&1\
+   || die "could not write $BINARYDIR/ntldr_boot_code_sektor0 to disk"
+
+message "Writing ntldr_boot_code_sektor12 into /dev/dsk$BOOTNUMBER"
+dd if=$BINARYDIR/ntldr_boot_code_sektor12 of=/dev/dsk$BOOTNUMBER bs=512 count=1 seek=12 > $LOGTTY 2>&1\
+   || die "could not write $BINARYDIR/ntldr_boot_code_sektor12 to disk"
+
+message "Writing saved disk geometry back into /dev/dsk$BOOTNUMBER" 
+dd if=/c/netinst/partgeo.bin of=/dev/dsk$BOOTNUMBER bs=1 seek=24 count=4 conv=notrunc > $LOGTTY 2>&1\
+   || die "could not write /c/netinst/partgeo.bin into /dev/dsk$BOOTNUMBER"
+
+#Move staging area for install.pl onto the drive
+mv /c /OLDc
+mkdir /c
+message "Mounting the soon-to-be 'C:' drive"
+mount -t vfat /dev/dsk$BOOTNUMBER /c || die "Mounting /dev/dsk$BOOTNUMBER failed!"
+message "Moving install.pl staging files to the real soon-to-be 'C:' drive"
+mv /OLDc/* /c/
+
+#aia paranoia
+cat /c/netinst/unattend.txt >> /dev/null || die "/c/netinst/unattend.txt gone missing!"
+
+#boot ini
+message "Creating boot.ini"
+echo "[Boot Loader]" >/c/boot.ini
+echo "Timeout=2" >>/c/boot.ini
+echo "Default=C:\\\$WIN_NT\$.~BT\BOOTSECT.DAT" >>/c/boot.ini
+echo "[Operating Systems]" >>/c/boot.ini
+echo "C:\\\$WIN_NT\$.~BT\BOOTSECT.DAT = \"Installation/Update Windows\"">>/c/boot.ini
+
+#more aia-paranoia, ..
+cat /c/boot.ini >> /dev/null || die "/c/boot.ini gone missing!"
+
+#creating directorys
+message "Creating /c/\$"
+mkdir /c/\$  
+
+message "Creating /c/\$win_nt\$.~bt"
+mkdir /c/\$win_nt\$.~bt  
+
+message "Creating /c/\$win_nt\$.~bt/system32"
+mkdir /c/\$win_nt\$.~bt/system32  
+
+message "Creating /c/\$win_nt\$.~ls"
+mkdir /c/\$win_nt\$.~ls  
+
+
+#bootsect.dat
+message "Creating bootsect.dat"
+dd if=/dev/dsk$BOOTNUMBER of=/c/\$win_nt\$.~bt/bootsect.dat bs=512 count=1 > $LOGTTY 2>&1
+message "Writing ntldr_boot_code into bootsect.dat"
+dd if=$BINARYDIR/ntldr_boot_code_install of=/c/\$win_nt\$.~bt/bootsect.dat\
+   bs=1 count=420 seek=90 conv=notrunc > $LOGTTY 2>&1\
+       || die "Failed writing $BINARYDIR/ntldr_boot_code_install into bootsect.dat"
+
+#copy files
+OS_media=`parse_ini_file /c/netinst/unattend.txt _meta OS_media`
+OS_DIR=`echo $OS_media | awk -F: '{print $2}' | sed 's/\\\/\\//g'`
+OS_DIR="/z$OS_DIR"
+if [ -d "$OS_DIR/amd64" ]
+then
+	ARCH=amd64
+	OS_INSTALL_DIR="$OS_DIR/amd64"
+else
+	ARCH=i386
+	OS_INSTALL_DIR="$OS_DIR/i386"
+fi
+
+copy_files "$OS_INSTALL_DIR/" "/c/\$win_nt\$.~ls/" 1 "Copy system"
+
+if [ -d "$OS_DIR/cmpnents" ]
+then
+	copy_files "$OS_DIR/cmpnents/" "/c/\$win_nt\$.~ls/" 1 "Copy cmpnents"
+fi
+
+if [ "$ARCH" == "amd64" ]
+then
+	copy_files "$OS_DIR/i386/" "/c/\$win_nt\$.~ls/" 1 "Copy i386 system"
+fi
+copy_files "/c/\$win_nt\$.~ls/$ARCH/" "/c/\$win_nt\$.~bt/" 2 "Copy $ARCH installation files."
+copy_files "/c/\$win_nt\$.~ls/$ARCH/system32/" "/c/\$win_nt\$.~bt/system32/" 2 "Copy $ARCH system32."
+copy_files "$OS_DIR/i386/ntldr" "/c/" 3 "Copy ntldr."
+copy_files "$OS_DIR/i386/ntdetect.com" "/c/" 3 "Copy ntdetect.com."
+copy_files "$OS_DIR/i386/setupldr.bin" "/c/\$ldr\$" 3 "Copy setupldr.bin."
+copy_files "$OS_INSTALL_DIR/txtsetup.sif" "/c/" 3 "Copy txtsetup.sif."
+
+message "Add some black magic to unattend.txt -prevents wininstaller to ask for CD"
+write_ini_entry /c/netinst/unattend.txt "GuiUnattended" "AutoLogon" "Yes"
+write_ini_entry /c/netinst/unattend.txt "Data" "MsDosInitiated" "1"
+write_ini_entry /c/netinst/unattend.txt "Data" "floppyless" "1"
+write_ini_entry /c/netinst/unattend.txt "Data" "OriSrc" "A:\I386"
+write_ini_entry /c/netinst/unattend.txt "Data" "OriTyp" "5"
+copy_files "/c/netinst/unattend.txt" "/c/\$win_nt\$.~bt/winnt.sif" 3 "Copy winnt.sif."
+
+#move files/drivers to the right place.....
+message "Move driver directory"
+mv /c/\$win_nt\$.~ls/$ARCH/\$[Oo][eE][mM]\$/* /c/\$/  
+
+#Copy textmode drivers into /c/$win_nt$.~bt/$oem$/ 
+#Do not move them instead, as it wont work.
+if [ -d "/c/\$/textmode/" ]
+then
+  message "Copy TEXTMODE driver directory"
+  mkdir /c/\$win_nt\$.~bt/\$oem\$/  
+  cp -r /c/\$/[Tt][Ee][Xx][Tt][Mm][Oo][Dd][Ee]/* /c/\$win_nt\$.~bt/\$oem\$/  
+fi
+
+#add files/drivers from windows drivers scan...
+#NOTE: we directly copy files into /c/\$\$1 (shortcut) since code
+#      just above is moving other drivers into this target directory.
+message "Copy drivers from scan of windows drivers"
+dir_map_drv_scan=`parse_ini_file /c/netinst/unattend.txt _meta scan_windrivers_dest_map`
+if [ "$dir_map_drv_scan" = "" ]; then
+	echo "(no driver to copy)."
+else
+	# NOTE: provide UNIX paths to copy_files
+	echo $dir_map_drv_scan | sed -e 's,\\,/,g' -e 's/@/\n/g'| while read map
+	do
+		drv_src=`echo $map | awk -F: '{print $1}'`
+		drv_dst="/c/\$/\$1/`echo $map | awk -F: '{print $2}'`"
+		# workaround: do not use copy_files():
+		#   command 'copy_files dir1 1 dir2' copies <dir1> as <dir2>/<dir1> !
+		#   so perform copy directly
+		mkdir -p `dirname "$drv_dst"` || die "failed to create dir. `dirname $drv_dst`"
+		cp -Lr "$drv_src" "$drv_dst" || die "recursive directory copy failed"
+	done
+fi
+
+message "Syncing disk -aiaparanoia :-)"
+sync
+
+echo -e "\E[1;32m------- \E[1;33m Done! ($0) \E[1;32m-------\E[0;37m"
+
+#END

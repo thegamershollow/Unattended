@@ -1,0 +1,62 @@
+# This is a list of one-line summaries of our supported drivers.  The
+# first word is the DOS driver name; the rest of the line is a
+# human-readable description.  To add support for a network card,
+# download the NDIS2 driver (.dos extension) from the card's
+# manufacturer, copy it to the drivers/ subdirectory, and add a line
+# to this file.  Then just type "make".
+
+# Downloaded from <http://www.broadcom.com/drivers/downloaddrivers.php>
+b44      Broadcom BCM440x family
+b57      Broadcom BCM57xx "Tigon3" family
+
+# DEC Tulip
+# http://www.google.com/search?q=dc21x4+site%3Aintel.com
+# http://www.intel.com/design/network/drivers/Nd2_300.htm
+dc21x4   DEC/Intel 2104x/2114x "Tulip" family
+
+# http://www.google.com/search?q=dp83815+drivers+site%3Anational.com
+dp83815  Natsemi 83815 "MacPHYTER" family (e.g., Netgear FA311/FA312)
+
+# Latest version should be here (or just search Intel's support site
+# for PRODOS2.EXE):
+# <http://downloadfinder.intel.com/scripts-df/File_Filter.asp?FileName=PRODOS2.EXE>
+e100b    Intel Pro/100 family of PCI and CardBus adapters
+e1000    Intel Pro/1000 family of gigabit adapters
+
+# Found by doing a search on product numbers (3cxfe575ct, 3cn3ac1556b,
+# 3c905c, 3c2000) at
+# <http://www.3com.com/products/en_US/downloadsindex.jsp>.
+elpc575  3com 3c575 family of CardBus adapters
+el556    3com 3c556 family of mini-PCI adapters
+el90x    3com 3c59x/3c90x family of PCI and CardBus adapters
+el94x    3com 3c94x/3c2000 family of gigabit adapters
+
+# <http://www.google.com/search?q=via+ethernet+drivers>
+# <http://www.viaarena.com/?PageID=71>
+fetnd    VIA VT86C100A/6102/6105 "Rhine" family (e.g., D-Link DFE-530TX)
+
+# http://www.marvell.com/drivers/driverDisplay.do?dId=113&pId=16
+yuknd    Marvell(R) Yukon(R) Ethernet Controller
+
+# http://kbserver.netgear.com/products/FA310.asp
+ngrpci   Netgear FA310
+
+# http://www.google.com/search?q=pcntnd.dos+site%3Aamd.com
+pcntnd   AMD PCNet family (also VMWare)
+
+# <http://www.realtek.com.tw/search/default.aspx?keyword=rtl8139>
+# <http://www.realtek.com.tw/search/default.aspx?keyword=rtl8169>
+# (thanks to Eugene Kotlyarov)
+rtsnd    Realtek RTL8139 family (e.g., D-Link DFE-530TX+)
+rtgbnd   Realtek RTL8169/8110S Gigabit family
+
+# Downloaded from <http://download.sis.com/>.
+sis900   SiS 900 family
+
+# This one is very special.  It implements NDIS2 over a PXE/UNDI
+# stack, which means it works when doing a network boot to DOS using
+# ANY adapter from ANY vendor.  It is included on the 3com MBA utility
+# disk, last seen at
+# <http://support.3com.com/infodeli/tools/nic/mba.htm>.
+undis3c  "Universal" NDIS UNDI driver (3com)
+

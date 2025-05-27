@@ -1,0 +1,13 @@
+# load virtio before anyone else
+virtio
+
+# load dmfe before tulip
+dmfe
+
+# load 8139cp before 8139too
+8139cp
+
+# load libata PIIX support before ide PIIX support, and both before
+# ide-generic
+ata_piix
+piix

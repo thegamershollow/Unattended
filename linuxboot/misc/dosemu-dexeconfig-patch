@@ -1,0 +1,12 @@
+diff -ur dosemu-1.4.0.1/src/tools/periph/dexeconfig.c dosemu-1.4.0.1-dev1/src/tools/periph/dexeconfig.c
+--- dosemu-1.4.0.1/src/tools/periph/dexeconfig.c	2007-05-04 06:59:48.000000000 +0100
++++ dosemu-1.4.0.1-dev1/src/tools/periph/dexeconfig.c	2009-05-17 11:09:27.000000000 +0100
+@@ -238,7 +238,7 @@
+     exit(1);
+   }
+   close(fd);
+-  fc = open(cfile, O_WRONLY | O_CREAT | O_TRUNC);
++  fc = open(cfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+   if (fc < 0) {
+     perror("cannot open config file");
+     exit(1);

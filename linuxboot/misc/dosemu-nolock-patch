@@ -1,0 +1,24 @@
+diff -r -u dosemu-1.3.4-orig/src/dosext/mfs/mfs.c dosemu-1.3.4/src/dosext/mfs/mfs.c
+--- dosemu-1.3.4-orig/src/dosext/mfs/mfs.c	2006-10-31 13:28:54.000000000 -0700
++++ dosemu-1.3.4/src/dosext/mfs/mfs.c	2007-03-12 08:42:04.000000000 -0600
+@@ -2629,6 +2629,12 @@
+ 
+ static int lock_file_region(int fd, int cmd, struct flock *fl, long long start, unsigned long len)
+ {
++#if 1
++  if (cmd == F_GETLK || cmd == F_GETLK64) {
++    fl->l_type = F_UNLCK;
++  }
++  return 0;
++#else
+   fl->l_whence = SEEK_SET;
+   fl->l_pid = 0;
+   /* first handle magic file lock value */
+@@ -2657,6 +2663,7 @@
+   fl->l_start = start;
+   fl->l_len = len;
+   return fcntl( fd, cmd, fl );
++#endif
+ }
+ 
+ static boolean_t

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo WELCOME!!!
+
+/bin/mkdir /tmp
+
+/bin/mkdir /sys
+/bin/mount -t sysfs sysfs /sys
+
+/bin/mkdir /proc
+/bin/mount -t proc proc /proc
+
+/bin/mkdir /dev/pts
+/bin/mount -t devpts devpts /dev/pts
+
+/bin/mkdir /z
+
+# For playing random games
+/bin/mkdir /mnt
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+# Fire up shells on virtual consoles 2 and 3
+if openvt -c 2 bash ; then
+    openvt -c 3 bash
+
+    openvt -f -c 1 -w /etc/master
+else
+    echo "Hm, maybe we are on a serial console.  Running /etc/master directly."
+    /etc/master
+fi
+
+echo "**** Master script exited!"
+exec bash

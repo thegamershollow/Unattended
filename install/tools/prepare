@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Change to the scripts directory so paths are correct
+cd "$(dirname "$0")"/..
+
+# default values
+SPIDER=""
+SCRIPTLOC="scripts"
+WINLANG=ENU
+DRY=0
+
+# process command line args.
+while [ $# -gt 0 ]
+do
+  case "$1" in
+  
+    "-h"|"--help")
+      echo "Usage: $0 [--check-only] [-h|--help] [-n] [-l <dir>|<file.bat>] [<winlang>|ALL|WHOLE]"
+      echo
+      echo "download or check all required files for installation scripts"
+      echo "by parsing *.bat scripts."
+      echo
+      echo "  -h, --help           (this) online help."
+      echo "  -n                   dry mode: do not download or check, just echo url to work on."  
+      echo "  --check-only         do not perform download, just check URL validity"
+      echo "  -l <dir>|<file.bat>  work with folder <dir> or file <file.bat> ; use folder scripts/ if nothing specified."
+      echo "  <winlang>            language to download/check; use 'ENU' if not provided."          
+      echo "  WHOLE                work with all languages: mainly usefull for --check-only operations."
+      exit 0
+      ;;
+  
+    "--check-only")
+      shift
+      SPIDER="--spider"
+      ;;
+  
+    "-l")
+      shift
+      SCRIPTLOC="$1"
+      shift
+      ;;
+  
+    "-n")
+      shift
+      DRY=1
+      ;;
+
+    *)
+      WINLANG="$1"
+      shift
+      ;;
+  esac
+done
+
+# checks
+if [ ! -f "$SCRIPTLOC" ] && [ ! -d "$SCRIPTLOC" ]
+then
+  echo "ERROR: '$SCRIPTLOC' is neither a folder or a file."
+  exit 1
+fi
+
+# regular expression to find url and file location based on lang
+REGEXFORLANG="URL\|($WINLANG|ALL)"
+if [ "$WINLANG" = "WHOLE" ]; then REGEXFORLANG="URL\|"; fi
+
+# list of files to work on
+WFILES="$SCRIPTLOC"   # default: file
+if [ -d "$SCRIPTLOC" ]
+then
+  WFILES=$( egrep -lri "$REGEXFORLANG" $SCRIPTLOC/*.bat )
+fi
+
+wgetnberr=0
+for cmdfile in $WFILES; do
+
+  echo
+  echo Processing $cmdfile
+
+  # Look for URL|LANG in scripts/ + second arg
+  for needed in `egrep -hri "$REGEXFORLANG" $cmdfile | tr ' ' '~'`; do
+      url=`echo -ne "$needed" | cut -d\| -f3 | tr '~' ' ' | perl -pe 's/[\r\n]//g;s/^ *//;s/ *$//'`
+      file=`echo -ne "$needed" | cut -d\| -f4 | tr '~' ' '  | perl -pe 's/[\r\n]//g;s/^ *//;s/ *$//;s/([^\/]*\/*)$/lc($1)/eg'`
+      path=`echo -ne "$file" | perl -pe 's#(.*/).*#$1#'`
+
+      if [ $DRY -eq 1 ]; then echo "dry: url=$url"; echo "dry: file=$file" ; continue; fi
+
+      if [ ! "$SPIDER" == "" ]; then
+        wget $SPIDER --passive-ftp "$url" ;
+        if [ $? -ne 0 ]; then wgetnberr=$(( $wgetnberr + 1 )); fi
+        continue
+      fi
+      # Make sure path is available
+      mkdir -p "$path"
+      # Download file if it doesn't exist
+      if [ ! -f "$file" ] ; then
+        if [ ${url: -7} == "torrent" ]; then
+          wget $WGET_OPS --passive-ftp -O "$file.$$.torrent" "$url" ;
+          if ctorrent -e 0 -s "$file.$$.tmp" "$file.$$.torrent" ; then
+              mv "$file.$$.tmp" "$file"
+          fi
+        else
+          if wget $SPIDER $WGET_OPS --passive-ftp -O "$file.$$.tmp" "$url" ; then
+              mv "$file.$$.tmp" "$file"
+          else
+              rm -f "$file.$$.tmp"
+              wgetnberr=$(( $wgetnberr + 1 ))
+          fi
+        fi
+      else
+          touch "$file"
+      fi
+  done
+
+done
+
+echo
+echo "nb of wget errors: $wgetnberr."
