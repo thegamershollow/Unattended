@@ -1,72 +1,51 @@
 #!/bin/bash
 
-#
 # This script updates your script files from the official
-# unattended repository.
-#
-# This scripts crawles through your script directory, and
-# tries to update every found file from the repository. You can
-# define exceptions in this script.
-#
-# Warning #1: this scripts overwrites YOUR changes to official
-# script files without any warning! Please double-check that
-# none of your own-written scripts accidentially have the same
-# name than any of the official scripts.
-#
-# Warning #2: it does not add scripts in the repository that are
-# not found in your script directory. You have to download
-# new scripts once manually.
-#
-# Warning #3: you might want to call it as cron job, but
-# please be not surprised by broken scripts.
-# This happens from time to time.
-#
+# GitHub repository using sparse-checkout (only 'install/scripts').
 
-#  you can write exceptions like this:
-# exceptions=( "win2ksp4-updates.bat" "win2ksp4-symbols.bat" )
-exceptions=( )
+# Define the GitHub repository URL (replace with the actual one)
+GIT_URL="https://github.com/thegamershollow/Unattended"
 
-# HTTP-Link to the cvs-repository
-SVNLINK="https://unattended.svn.sourceforge.net/svnroot/unattended/trunk/install/scripts"
+# Define the subdirectory to checkout
+SPARSE_PATH="install/scripts"
 
-# paths to needed programs
-WGET=$(which wget)
-FIND=$(which find)
-GREP=$(which grep)
-SORT=$(which sort)
-SVN=$(which svn)
+# Define the destination directory
+DEST_DIR="scripts"
 
-# Change to the scripts directory so paths are correct
-cd "$(dirname "$0")"/../scripts
+# Move to the script's parent directory
+cd "$(dirname "$0")"/..
 
-
-if [ ! -f $SVN ]
-then
-   echo \****** INSTALL SVN ON YOUR SYSTEM *************\*
+# Check if Git is installed
+if ! command -v git >/dev/null 2>&1; then
+    echo "Error: Git is not installed or not in PATH."
+    exit 1
 fi
 
-#If there is SVN information when use svn as it has better support
-if [ -d .svn ]
-then
-    $SVN up
-    exit 0
-else
-    echo \****** MISING SVN INFO *************\*
-    echo \*            RUN:
-    echo \*   mv scripts scripts.old
-    echo \*   svn co $SVNLINK scripts 
-    echo \****** MISING SVN INFO *************\*
+# If the destination directory exists and is a Git repo, pull updates
+if [ -d "$DEST_DIR/.git" ]; then
+    echo "Updating existing Git checkout in '$DEST_DIR'..."
+    cd "$DEST_DIR"
+    git pull
+# If the destination exists but isn't a Git repo, back it up and clone fresh
+elif [ -d "$DEST_DIR" ]; then
+    echo "Directory '$DEST_DIR' exists but is not a Git repository."
+    BACKUP_DIR="${DEST_DIR}_backup_$(date +%Y%m%d%H%M%S)"
+    echo "Backing up existing directory to '$BACKUP_DIR'..."
+    mv "$DEST_DIR" "$BACKUP_DIR"
 fi
 
+# If DEST_DIR doesn't exist or was just backed up, perform sparse checkout
+if [ ! -d "$DEST_DIR" ]; then
+    echo "Performing sparse checkout of '$SPARSE_PATH'..."
+    mkdir "$DEST_DIR"
+    cd "$DEST_DIR"
+    git init
+    git remote add origin "$GIT_URL"
+    git config core.sparseCheckout true
+    echo "$SPARSE_PATH/" > .git/info/sparse-checkout
+    git pull origin main  # Replace 'main' with 'master' if needed
+    mv "$SPARSE_PATH"/* .
+    rm -rf "$SPARSE_PATH"
+fi
 
-# crawl through the script-dir
-for file in $($FIND . -type f -name "*.bat" | $GREP -v .svn | $SORT)
-do
-    if [[ "${exceptions[@]%%${file##./}}" != "${exceptions[@]}" ]]; then continue; fi
-    if $WGET $1 --output-document "$file.$$.tmp" $SVNLINK/$file
-    then
-        mv "$file.$$.tmp" "$file"
-    else
-        rm -f "$file.$$.tmp"
-    fi
-done
+echo "Update complete. Scripts are located in the '$DEST_DIR' directory."
