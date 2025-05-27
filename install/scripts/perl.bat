@@ -11,7 +11,7 @@ if not "%WINVER%" == "win2k" goto skipinstaller3
 :: Windows Installer 2.0 Redistributable for Windows NT 4.0 and 2000
 :: <http://www.microsoft.com/downloads/details.aspx?FamilyID=4B6140F9-2D36-4977-8FA1-6F8A0F5DCA8F>
 :: Doesn't hurt to install this as it exits nicely if not needed.
-:: URL|ALL|http://download.microsoft.com/download/WindowsInstaller/Install/2.0/NT45/EN-US/InstMsiW.exe|packages/windowsinstaller/instmsiw.exe
+:: URL|ALL|http://web.archive.org/web/20110716071233/https://download.microsoft.com/download/WindowsInstaller/Install/2.0/NT45/EN-US/InstMsiW.exe|packages/windowsinstaller/instmsiw.exe
 %Z%\packages\windowsinstaller\InstMsiW.exe /q /c:"msiinst.exe /i instmsi.msi /q"
 
 :: Windows Installer 3.0 only installs on Win2000 SP3 or SP4,
@@ -25,12 +25,12 @@ if "%WINVER%" == "win2k" goto skipinstaller3
 :: <http://support.microsoft.com/kb/893803>
 :: <http://www.microsoft.com/downloads/details.aspx?familyid=889482FC-5F56-4A38-B838-DE776FD4138C>
 :: Doesn't hurt to install this as it exits nicely if not needed (Except on win2k).
-:: URL|ALL|http://download.microsoft.com/download/1/4/7/147ded26-931c-4daf-9095-ec7baf996f46/WindowsInstaller-KB893803-v2-x86.exe|packages/windowsinstaller/windowsinstaller-kb893803-v2-x86.exe
+:: URL|ALL|http://web.archive.org/web/20110608151626/http://download.microsoft.com/download/1/4/7/147ded26-931c-4daf-9095-ec7baf996f46/WindowsInstaller-KB893803-v2-x86.exe|packages/windowsinstaller/windowsinstaller-kb893803-v2-x86.exe
 %Z%\packages\windowsinstaller\windowsinstaller-kb893803-v2-x86.exe /passive /norestart
 :skipinstaller3
 
-:: URL|ALL|http://downloads.activestate.com/ActivePerl/releases/5.22.1.2201/ActivePerl-5.22.1.2201-MSWin32-x86-64int-299574.msi|packages/perl/activeperl-5.22.1.2201-mswin32-x86-299574.msi
-:: URL|ALL|http://downloads.activestate.com/ActivePerl/releases/5.22.1.2201/ActivePerl-5.22.1.2201-MSWin32-x64-299574.msi|packages/perl/activeperl-5.22.1.2201-mswin32-AMD64-299574.msi
+:: URL|ALL|https://web.archive.org/web/20160610154704/https://downloads.activestate.com/ActivePerl/releases/5.22.1.2201/ActivePerl-5.22.1.2201-MSWin32-x86-64int-299574.msi|packages/perl/activeperl-5.22.1.2201-mswin32-x86-299574.msi
+:: URL|ALL|http://web.archive.org/web/20160609203544/https://downloads.activestate.com/ActivePerl/releases/5.22.1.2201/ActivePerl-5.22.1.2201-MSWin32-x64-299574.msi|packages/perl/activeperl-5.22.1.2201-mswin32-AMD64-299574.msi
 
 set perl_msi=%Z%\packages\perl\activeperl-5.22.1.2201-mswin32-%PROCESSOR_ARCHITECTURE%-299574.msi
 
