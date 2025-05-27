@@ -1,1 +1,0 @@
-set tightvncpass=xxxxxxxx
