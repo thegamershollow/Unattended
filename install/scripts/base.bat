@@ -1,6 +1,9 @@
 :: MASTER: Perform a basic workstation installation
 @Echo off
 
+:: install legacy update by default
+todo.pl legacyupdate.bat
+
 :: Set Automatic Updates to download and update automatically (SP2 behavior)
 todo.pl "auconfig.pl --day 0 --time 3 --wait 10 4"
 
@@ -8,7 +11,7 @@ todo.pl "auconfig.pl --day 0 --time 3 --wait 10 4"
 todo.pl defrag.bat
 
 :: Update windows and turn off annoying stuff.
-todo.pl %%WINVER%%-updates.bat %%WINVER%%-notips.pl .reboot
+todo.pl %%WINVER%%-notips.pl .reboot
 
 :: Set IIS startup type to manual and ignore if not installed.
 todo.pl ".ignore-err 255 startup-type.pl Manual IISADMIN" ".ignore-err 255 startup-type.pl Manual W3SVC"
