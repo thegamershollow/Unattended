@@ -1,51 +1,75 @@
 #!/bin/bash
 
-# This script updates your script files from the official
-# GitHub repository using sparse-checkout (only 'install/scripts').
+# Script to fetch 'install/scripts' from GitHub main branch as ZIP
+# and place contents in local 'scripts/' folder
 
-# Define the GitHub repository URL (replace with the actual one)
-GIT_URL="https://github.com/thegamershollow/Unattended"
-
-# Define the subdirectory to checkout
-SPARSE_PATH="install/scripts"
-
-# Define the destination directory
+ZIP_URL="https://github.com/thegamershollow/Unattended/archive/refs/heads/main.zip"
+ZIP_NAME="unattended_main.zip"
+ZIP_SUBDIR="Unattended-main/install/scripts"
 DEST_DIR="scripts"
 
-# Move to the script's parent directory
+# Move to script's parent directory
 cd "$(dirname "$0")"/..
 
-# Check if Git is installed
-if ! command -v git >/dev/null 2>&1; then
-    echo "Error: Git is not installed or not in PATH."
+echo "Working in: $(pwd)"
+
+# Check for required tools
+for cmd in curl unzip; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Error: '$cmd' is required but not installed."
+        exit 1
+    fi
+done
+
+# Create temp directory
+TEMP_DIR=$(mktemp -d)
+echo "Using temp directory: $TEMP_DIR"
+cd "$TEMP_DIR"
+
+# Download ZIP
+echo "Downloading ZIP from $ZIP_URL..."
+if ! curl -L -o "$ZIP_NAME" "$ZIP_URL"; then
+    echo "Download failed."
+    rm -rf "$TEMP_DIR"
     exit 1
 fi
 
-# If the destination directory exists and is a Git repo, pull updates
-if [ -d "$DEST_DIR/.git" ]; then
-    echo "Updating existing Git checkout in '$DEST_DIR'..."
-    cd "$DEST_DIR"
-    git pull
-# If the destination exists but isn't a Git repo, back it up and clone fresh
-elif [ -d "$DEST_DIR" ]; then
-    echo "Directory '$DEST_DIR' exists but is not a Git repository."
+# Extract ZIP
+echo "Extracting ZIP..."
+if ! unzip -q "$ZIP_NAME"; then
+    echo "Extraction failed."
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+# Check if extracted folder exists
+if [ ! -d "$ZIP_SUBDIR" ]; then
+    echo "Error: Expected directory '$ZIP_SUBDIR' not found in ZIP."
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+# Move back to original project root
+cd - > /dev/null
+
+# Backup old DEST_DIR if it exists
+if [ -d "$DEST_DIR" ]; then
     BACKUP_DIR="${DEST_DIR}_backup_$(date +%Y%m%d%H%M%S)"
-    echo "Backing up existing directory to '$BACKUP_DIR'..."
+    echo "Backing up existing '$DEST_DIR' to '$BACKUP_DIR'..."
     mv "$DEST_DIR" "$BACKUP_DIR"
 fi
 
-# If DEST_DIR doesn't exist or was just backed up, perform sparse checkout
-if [ ! -d "$DEST_DIR" ]; then
-    echo "Performing sparse checkout of '$SPARSE_PATH'..."
-    mkdir "$DEST_DIR"
-    cd "$DEST_DIR"
-    git init
-    git remote add origin "$GIT_URL"
-    git config core.sparseCheckout true
-    echo "$SPARSE_PATH/" > .git/info/sparse-checkout
-    git pull origin main  # Replace 'main' with 'master' if needed
-    mv "$SPARSE_PATH"/* .
-    rm -rf "$SPARSE_PATH"
+# Copy extracted scripts
+echo "Copying contents of '$ZIP_SUBDIR' into '$DEST_DIR'..."
+mkdir -p "$DEST_DIR"
+cp -a "$TEMP_DIR/$ZIP_SUBDIR/." "$DEST_DIR/"
+
+# Confirm result
+if [ "$(ls -A "$DEST_DIR")" ]; then
+    echo "✅ Update complete. Scripts are now in the '$DEST_DIR/' directory."
+else
+    echo "❌ ERROR: '$DEST_DIR/' is empty after copy!"
 fi
 
-echo "Update complete. Scripts are located in the '$DEST_DIR' directory."
+# Clean up
+rm -rf "$TEMP_DIR"
