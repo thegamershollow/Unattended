@@ -10,6 +10,7 @@ set "dxfile=%SystemRoot%\System32\d3dx9_43.dll"
 if exist "%dxfile%" goto done
 if "%dxver%"=="4.09.00.0904" goto done
 
-todo.pl "%Z%\packages\directx9\directx_Jun2010_redist.exe"
+todo.pl "%Z%\packages\directx9\directx_Jun2010_redist.exe /Q /T:C:\directx9\"
+del C:\directx9 /Q
 
 :done
