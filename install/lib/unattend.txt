@@ -3,7 +3,7 @@
 
 [GuiUnattended]
     ; See <http://unattended.sourceforge.net/timezones.html>
-    TimeZone=35
+    TimeZone=90
     OEMSkipRegional=1
     OemSkipWelcome=1
 
